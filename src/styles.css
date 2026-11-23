@@ -1,0 +1,3 @@
+:root{--paper:#F6F4EF;--ink:#1B1A17;--mute:#77726A;--soft:#8B857B;--line:#DED9CF;--red:#B4432F;--green:#5F7255;--amber:#A9762E;--serif:"Songti SC","STSong","SimSun","Noto Serif SC",serif;--sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",system-ui,sans-serif;--mono:"SF Mono","JetBrains Mono","Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}html,body,#root{height:100%}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;overflow:hidden}
+.app.loading{display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--serif);font-size:24px;color:var(--mute)}
