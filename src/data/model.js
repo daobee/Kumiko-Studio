@@ -620,6 +620,7 @@ export function validate(project, layout, profile) {
       }
     }
   }
+  if (project.frame.hangers && !layout.hangers.length) add('warn', 'noHangers');
   if (!profile?.calibrated) add('warn', 'profile');
   return out;
 }
@@ -628,6 +629,7 @@ export function validationText(issue, t) {
   const map = {
     invalidFrame: 'error.invalidFrame',
     border: 'error.border',
+    noHangers: 'frameEditor.noHangers',
     noCells: 'error.noCells',
     bed: 'error.bed',
     profile: 'error.profile',

@@ -24,6 +24,9 @@ const DEFAULTS = {
   brush: { patternId: 'asanoha', color: 0 }
 };
 
+const UndoIcon = () => <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3L2 7l4 4"/><path d="M2 7h7a4 4 0 1 1 0 8H5"/></svg>;
+const RedoIcon = () => <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3l4 4-4 4"/><path d="M14 7H7a4 4 0 1 0 0 8h4"/></svg>;
+
 function firstPattern(mode) {
   return mode === 'square' ? 'sq_flower' : 'asanoha';
 }
@@ -537,8 +540,8 @@ export default function App() {
             <button className={lang === 'zh' ? 'on' : ''} onClick={() => changeLang('zh')}>中</button>
             <button className={lang === 'en' ? 'on' : ''} onClick={() => changeLang('en')}>EN</button>
           </div>
-          <button className="icon-btn" onClick={undo} disabled={!undoRef.current.length} title={t('common.undo')}>↶</button>
-          <button className="icon-btn" onClick={redo} disabled={!redoRef.current.length} title={t('common.redo')}>↷</button>
+          <button className="icon-btn" onClick={undo} disabled={!undoRef.current.length} title={t('common.undo')}><UndoIcon/></button>
+          <button className="icon-btn" onClick={redo} disabled={!redoRef.current.length} title={t('common.redo')}><RedoIcon/></button>
           <span className={'saved-dot ' + saving} />
           <span className="saved-label">{saving === 'busy' ? t('app.saving') : saving === 'conflict' ? t('app.conflict') : t('app.saved')}</span>
           <div className="export-wrap">
@@ -624,7 +627,7 @@ export default function App() {
             <div className="rail-section">
               <div className="rail-kicker">{t('left.profile')}</div>
               <div className="profile-summary">
-                <div>{profile.label}</div>
+                <div>{lang === 'en' ? (profile.labelEn || profile.label) : profile.label}</div>
                 <div className={profile.calibrated ? 'ok' : 'warn'}>{profile.calibrated ? t('profile.calibratedOk') : t('left.profilePending')}</div>
                 <button className="linkish" onClick={() => setModal('profile')}>{t('left.editProfile')}</button>
               </div>
@@ -701,8 +704,8 @@ export default function App() {
                   <button className={tool === 'frame' ? 'on' : ''} onClick={() => setTool('frame')}>{t('stage.frameTool')}</button>
                   <button onClick={() => setModal('image')}>{t('stage.imageTool')}</button>
                   <span className="toolbar-sep" />
-                  <button className="icon-btn" onClick={undo} disabled={!undoRef.current.length} title={t('common.undo')}>↶</button>
-                  <button className="icon-btn" onClick={redo} disabled={!redoRef.current.length} title={t('common.redo')}>↷</button>
+                  <button className="icon-btn" onClick={undo} disabled={!undoRef.current.length} title={t('common.undo')}><UndoIcon/></button>
+                  <button className="icon-btn" onClick={redo} disabled={!redoRef.current.length} title={t('common.redo')}><RedoIcon/></button>
                   <button className={project.grid.mode === 'square' ? 'hidden' : ''} onClick={rotateSel} disabled={!selection.size}>{t('pattern.rotate')}</button>
                   <button onClick={mirrorSel} disabled={!selection.size}>{t('pattern.mirror')}</button>
                   <button onClick={toggleLayer} disabled={!selection.size}>{t('pattern.background')}</button>
@@ -712,7 +715,7 @@ export default function App() {
                   <button className={showBlocks ? 'on' : ''} onClick={() => setShowBlocks(v => !v)}>{t('frameEditor.blocks')}</button>
                   <button className="icon-btn" onClick={() => setZoom(z => Math.min(4, z * 1.25))} title={t('stage.zoomIn')}>+</button>
                   <button className="icon-btn" onClick={() => setZoom(z => Math.max(0.5, z / 1.25))} title={t('stage.zoomOut')}>−</button>
-                  <button className="icon-btn" onClick={() => setZoom(1)} title={t('stage.fit')}>⌂</button>
+                  <button className="icon-btn" onClick={() => setZoom(1)} title={t('stage.fit')}>{t('stage.fit')}</button>
                   <button className={mini3d ? 'on' : ''} onClick={() => setMini3d(v => !v)}>{t('stage.mini3d')}</button>
                 </div>
                 <div className="stage-body">
@@ -732,8 +735,8 @@ export default function App() {
                 <div className="stage-status">
                   <span>{t('stage.selected', { n: selection.size })}</span>
                   <span>· {t('stage.tool')} {t(tool === 'brush' ? 'stage.brush' : tool === 'frame' ? 'stage.frameTool' : 'stage.select')}</span>
-                  <span>· {t('stage.pattern')} {currentPattern ? patternName(currentPattern, lang) : '—'}</span>
-                  <span>· {t('stage.color')} {coLabel(project, brush.color, lang)}</span>
+                  <span>· {t('stage.pattern')} {selectedCells.length === 1 ? patternName(selectedCells[0].pattern, lang) : (currentPattern ? patternName(currentPattern, lang) : '—')}</span>
+                  <span>· {t('stage.color')} {coLabel(project, selectedCells.length === 1 ? selectedCells[0].color : brush.color, lang)}</span>
                   {lowConfidence > 0 && <span className="warn">· {t('stage.lowConfidence', { n: lowConfidence })}</span>}
                   {errors.length > 0 && <span className="error">· {validationText(errors[0], t)}</span>}
                 </div>

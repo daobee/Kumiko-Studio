@@ -133,8 +133,9 @@ export async function convertImage(img, project, layout, opts = {}, onProgress) 
   ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
 
   const kind = project.grid.mode === 'square' ? 'square' : 'triangle';
-  const patterns = PATTERNS.filter(p => p.cell === kind && (opts.patternIds?.length ? opts.patternIds.includes(p.id) : true));
-  const pool = patterns.length ? patterns : PATTERNS.filter(p => p.cell === kind);
+  const allPatterns = [...PATTERNS, ...(project.customPatterns || [])];
+  const patterns = allPatterns.filter(p => p.cell === kind && (opts.patternIds?.length ? opts.patternIds.includes(p.id) : true));
+  const pool = patterns.length ? patterns : allPatterns.filter(p => p.cell === kind);
   const colors = project.printer.colors;
   const samples = [];
   for (const cell of layout.cells) {

@@ -186,12 +186,19 @@ export default function PatternEditor2D({
     >
       <rect x={vx} y={vy} width={vw} height={vh} fill="transparent" onPointerDown={bgDown} />
       <rect x={bb.minX} y={bb.minY} width={bb.w} height={bb.h} fill="#F1E9D8" stroke="none" />
-      {underlay?.dataURL && (
-        <image href={underlay.dataURL} x={bb.minX} y={bb.minY} width={bb.w} height={bb.h}
-          preserveAspectRatio="xMidYMid slice" opacity={underlay.opacity ?? 0.4} />
-      )}
       <path d={layout.inner ? layout.inner.map((p, i) => `${i ? 'L' : 'M'}${p[0]},${p[1]}`).join('') + 'Z' : ''}
         fill="#F6F4EF" stroke="none" />
+      <defs>
+        <clipPath id="pattern-inner-clip">
+          <path d={layout.inner ? layout.inner.map((p, i) => `${i ? 'L' : 'M'}${p[0]},${p[1]}`).join('') + 'Z' : `M${bb.minX},${bb.minY}h${bb.w}v${bb.h}h${-bb.w}Z`} />
+        </clipPath>
+      </defs>
+      {underlay?.dataURL && (
+        <g clipPath="url(#pattern-inner-clip)">
+          <image href={underlay.dataURL} x={bb.minX} y={bb.minY} width={bb.w} height={bb.h}
+            preserveAspectRatio="xMidYMid slice" opacity={underlay.opacity ?? 0.4} />
+        </g>
+      )}
       <g>
         {layout.cells.map(cell => {
           const sel = selection.has(cell.id);
@@ -233,12 +240,6 @@ export default function PatternEditor2D({
           <text x={b.x + 2} y={b.y + 5} fontSize="3.4" fill="#77726A" fontFamily="PingFang SC, sans-serif">B{b.index + 1}</text>
         </g>
       ))}
-      {tool === 'frame' && layout.outer.map((p, i) => (
-        <g key={i}>
-          <circle cx={p[0]} cy={p[1]} r={Math.max(1.6, 3 / z)} fill="#F6F4EF" stroke="#B4432F" strokeWidth=".6"
-            style={{ cursor: 'move' }} onPointerDown={e => vertexDown(e, i)} />
-        </g>
-      ))}
       {tool === 'frame' && layout.outer.map((a, i) => {
         const b = layout.outer[(i + 1) % layout.outer.length];
         return (
@@ -250,6 +251,12 @@ export default function PatternEditor2D({
             onPointerDown={e => edgeDown(e, i)} />
         );
       })}
+      {tool === 'frame' && layout.outer.map((p, i) => (
+        <g key={i}>
+          <circle cx={p[0]} cy={p[1]} r={Math.max(1.6, 3 / z)} fill="#F6F4EF" stroke="#B4432F" strokeWidth=".6"
+            style={{ cursor: 'move' }} onPointerDown={e => vertexDown(e, i)} />
+        </g>
+      ))}
       {marquee && (
         <rect x={Math.min(marquee.x0, marquee.x1)} y={Math.min(marquee.y0, marquee.y1)}
           width={Math.abs(marquee.x1 - marquee.x0)} height={Math.abs(marquee.y1 - marquee.y0)}

@@ -146,7 +146,11 @@ export function buildMeshes(project, layout) {
   }
   const bg = new MeshBuilder();
   const bb = layout.bbox;
-  bg.box(bb.w, bb.h, project.grid.backgroundThickness, bb.minX + bb.w / 2, bb.minY + bb.h / 2, -project.grid.backgroundThickness / 2);
+  if (layout.inner?.length >= 3) {
+    bg.prism(layout.inner, project.grid.backgroundThickness, 0, 0, 0);
+  } else {
+    bg.box(bb.w, bb.h, project.grid.backgroundThickness, bb.minX + bb.w / 2, bb.minY + bb.h / 2, -project.grid.backgroundThickness / 2);
+  }
   meshes.push(bg.mesh('background', colorOf(project, project.frame.background).hex));
   return meshes;
 }
@@ -310,6 +314,9 @@ export function oneToOneSVG(project, layout, lang, t) {
     `<g><circle cx="${(p[0] + ox).toFixed(2)}" cy="${(p[1] + oy).toFixed(2)}" r="2" fill="none" stroke="#b4432f" stroke-width=".5"/>
      <text x="${(p[0] + ox + 3).toFixed(2)}" y="${(p[1] + oy + 1).toFixed(2)}" font-size="3" fill="#b4432f">P${i + 1}</text></g>`).join('');
   const title = `${project.name} · ${layout.actualW.toFixed(1)} × ${layout.actualH.toFixed(1)} mm · pitch ${project.grid.pitch} mm`;
+  const hangText = layout.hangers.length
+    ? layout.hangers.map((p, i) => `P${i + 1} (${p[0].toFixed(0)}, ${p[1].toFixed(0)})`).join(' · ')
+    : '';
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${w.toFixed(1)}mm" height="${h.toFixed(1)}mm" viewBox="0 0 ${w.toFixed(1)} ${h.toFixed(1)}">
 <rect width="100%" height="100%" fill="#fff"/>
@@ -327,6 +334,7 @@ ${blocks}${hangers}
 <text x="${pad}" y="12" font-size="4.4" fill="#111">${title}</text>
 <text x="${pad}" y="19" font-size="3.2" fill="#b4432f">${t('export.doNotScale')}</text>
 <text x="${w - pad}" y="12" text-anchor="end" font-size="3.2" fill="#777">paperview-v1 · ${new Date().toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US')}</text>
+<text x="${pad}" y="${h - 8}" font-size="3.2" fill="#555">${hangText}</text>
 </g>
 </svg>`;
 }

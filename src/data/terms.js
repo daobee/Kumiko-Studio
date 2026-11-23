@@ -51,6 +51,7 @@ export const PARAMS = {
 export const DEFAULT_PROFILE = {
   id: 'paperview-v1',
   label: 'Paper View · v1（待标定）',
+  labelEn: 'Paper View · v1 (uncalibrated)',
   source: 'transcribed',
   calibrated: false,
   revision: 1,

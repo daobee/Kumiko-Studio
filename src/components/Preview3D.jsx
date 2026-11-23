@@ -213,8 +213,15 @@ export default function Preview3D({
       } catch {}
     }
 
-    // background / backlight plane
-    const bg = new THREE.Mesh(new THREE.PlaneGeometry(bb.w, bb.h), st.bgMat);
+    // background / backlight, clipped to the inner frame shape
+    let bgGeo;
+    if (layout.inner?.length >= 3) {
+      try {
+        const bs = new THREE.Shape(layout.inner.map(([x, y]) => new THREE.Vector2(...toScene(x, y))));
+        bgGeo = new THREE.ShapeGeometry(bs);
+      } catch { bgGeo = new THREE.PlaneGeometry(bb.w, bb.h); }
+    } else bgGeo = new THREE.PlaneGeometry(bb.w, bb.h);
+    const bg = new THREE.Mesh(bgGeo, st.bgMat);
     bg.position.z = -project.grid.backgroundThickness - 25;
     bg.receiveShadow = !mini;
     group.add(bg);
