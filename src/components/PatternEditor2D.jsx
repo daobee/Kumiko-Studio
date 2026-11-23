@@ -127,18 +127,15 @@ export default function PatternEditor2D({
   const vertexDown = (e, i) => {
     e.stopPropagation();
     if (e.button === 2) return;
-    if (e.altKey) {
-      if (layout.outer.length > 3) {
-        onStrokeStart?.();
-        const poly = layout.outer.filter((_, k) => k !== i);
-        onFramePolygon?.(poly, false);
-        onFrameCommit?.();
-      }
-      return;
-    }
-    const p = toSvg(e);
     dragFrame.current = { i, poly: layout.outer.map(q => [...q]) };
     onStrokeStart?.();
+  };
+  const vertexClick = (e, i) => {
+    if (!e.altKey) return;
+    if (layout.outer.length <= 3) return;
+    const poly = layout.outer.filter((_, k) => k !== i);
+    onFramePolygon?.(poly, false);
+    onFrameCommit?.();
   };
 
   const vertexMove = (e) => {
@@ -254,7 +251,7 @@ export default function PatternEditor2D({
       {tool === 'frame' && layout.outer.map((p, i) => (
         <g key={i}>
           <circle cx={p[0]} cy={p[1]} r={Math.max(1.6, 3 / z)} fill="#F6F4EF" stroke="#B4432F" strokeWidth=".6"
-            style={{ cursor: 'move' }} onPointerDown={e => vertexDown(e, i)} />
+            style={{ cursor: 'move' }} onPointerDown={e => vertexDown(e, i)} onClick={e => vertexClick(e, i)} />
         </g>
       ))}
       {marquee && (
